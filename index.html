@@ -32,6 +32,7 @@
             overflow: hidden;
         }
 
+        /* 검은색과 붉은색 테마의 픽셀 그리드 배경 */
         .background {
             position: absolute;
             top: 0;
@@ -113,6 +114,7 @@
         .btn.red { border-color: var(--accent-color); color: var(--accent-color); }
         .btn.red:hover { background-color: var(--accent-color); color: white; box-shadow: 6px 6px 0px #fff; }
 
+        /* 클릭 불가능한 버튼 스타일 */
         .btn.disabled {
             border-color: #555;
             color: #555;
@@ -126,6 +128,7 @@
             box-shadow: 4px 4px 0px #000;
         }
 
+        /* 텍스트 박스 반응형 레이아웃 */
         .content-box {
             background: var(--surface-color);
             padding: 25px;
@@ -138,6 +141,7 @@
             line-height: 1.8;
         }
 
+        /* 모달창 공통 스타일 */
         #consent-modal, #nickname-modal {
             position: fixed;
             top: 0;
@@ -162,6 +166,7 @@
             line-height: 1.6;
         }
 
+        /* 반응형 회의장 탁자 스타일 */
         .table-container {
             position: relative;
             width: 90vmin; 
@@ -200,6 +205,7 @@
             word-break: keep-all;
         }
 
+        /* 국가 수장 노드 스타일 */
         .character {
             position: absolute;
             display: block;
@@ -226,6 +232,7 @@
         .character.player { filter: drop-shadow(0 0 8px #ffeb3b); }
         .character.player .char-name { color: #ffeb3b; font-weight: bold; border: 1px solid #ffeb3b; }
 
+        /* 모바일 대응 입력/제어 컨트롤 패널 */
         .controls {
             margin-top: 15px;
             display: block;
@@ -288,6 +295,7 @@
 
         .opinion-meta { font-size: 0.75rem; color: #8a8d9a; margin-bottom: 5px; font-family: 'Press Start 2P', cursive; }
 
+        /* 모바일 기기용 미디어 쿼리 조정 */
         @media (max-width: 600px) {
             h1 { font-size: 2.2rem; }
             h2 { font-size: 1.5rem; }
@@ -304,7 +312,7 @@
 
     <div class="background"></div>
 
-    <div id="consent-modal" class="hidden">
+    <div id="consent-modal">
         <div class="consent-box">
             <h3 style="color: var(--accent-color); margin-bottom: 15px; text-align: center; font-size: 1.1rem;">개인정보 이용 동의</h3>
             <p style="font-size: 0.9rem; margin-bottom: 20px; word-break: keep-all;">
@@ -326,8 +334,8 @@
                 OPINION 탭에 표시될 당신의 닉네임을 입력해 주세요.<br>
                 (입력하지 않으면 '익명'으로 처리됩니다.)
             </p>
-            <input type="text" id="user-nickname" class="pixel-input" placeholder="닉네임 (최대 10자)" maxlength="10" style="text-align: center; margin-bottom: 20px;">
-            <button class="btn red" style="margin: 0 auto; width: 80%; padding: 12px;" onclick="window.gameApp.saveNickname()">확인 및 게임시작</button>
+            <input type="text" id="user-nickname" class="pixel-input" placeholder="닉네임 입력 (최대 10자)" maxlength="10" style="text-align: center; margin-bottom: 20px;">
+            <button class="btn red" style="margin: 0 auto; width: 80%; padding: 12px;" onclick="window.gameApp.saveNickname()">게임 시작하기</button>
         </div>
     </div>
 
@@ -345,4 +353,310 @@
         <h2>ABOUT</h2>
         <div class="content-box">
             <p><strong>이베로 아메리카 정상회의(Cumbre Iberoamericana)</strong>는 스페인어와 포르투갈어를 공용어로 사용하는 유럽과 아메리카 대륙의 22개국 국가 원수들이 모여 교류하는 국제 정상협의체입니다.</p>
-            <p>본 시뮬레이터에서 참가자는 새로운 스페인어권 국가의 수장이 되어
+            <p>본 시뮬레이터에서 참가자는 새로운 스페인어권 국가의 수장이 되어 원형 테이블에 둘러앉아 역사적인 의사결정과 의제 투표에 직접 참여하게 됩니다. 다수결 객관식 표결안건뿐만 아니라 주관식 의견 제안 라운드를 경험할 수 있습니다.</p>
+        </div>
+        <div class="menu-container"><button class="btn" onclick="window.gameApp.showStart()">BACK</button></div>
+    </div>
+
+    <div id="opinion-screen" class="screen hidden">
+        <h2>REAL-TIME OPINIONS</h2>
+        <div class="content-box">
+            <p style="margin-top:0; color:var(--accent-color); font-weight:bold; font-size:0.9rem;">🔥 정상회의 참가자 실시간 의견 목록</p>
+            <div class="opinion-list" id="realtime-opinion-list">
+                <div style="text-align:center; color:#8a8d9a; padding:20px;">의견을 불러오는 중입니다...</div>
+            </div>
+        </div>
+        <div class="menu-container"><button class="btn" onclick="window.gameApp.showStart()">BACK</button></div>
+    </div>
+
+    <div id="game-screen" class="screen hidden">
+        <h3 style="font-size:1.1rem; margin-bottom:5px; color:var(--accent-color);">ROUND <span id="round-number">1</span></h3>
+        
+        <div class="table-container" id="table-container">
+            <div class="round-table">
+                <div class="topic-display" id="topic-text">안건 로딩 중...</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div id="vote-controls" class="flex-controls hidden">
+                <button class="btn" style="border-color: #2ecc71; color: #2ecc71;" onclick="window.gameApp.vote('찬성(Sí)')">찬성(Sí)</button>
+                <button class="btn" style="border-color: #e74c3c; color: #e74c3c;" onclick="window.gameApp.vote('반대(No)')">반대(No)</button>
+                <button class="btn" style="border-color: #f1c40f; color: #f1c40f;" onclick="window.gameApp.vote('기권')">기권</button>
+            </div>
+
+            <div id="subjective-controls" class="opinion-input-box hidden">
+                <input type="text" id="opinion-input" class="pixel-input" placeholder="국가의 공식 의견을 입력하세요..." maxlength="100">
+                <button class="btn red" style="margin:0; width:100%; padding:10px;" onclick="window.gameApp.submitOpinion()">주장 제출하기</button>
+            </div>
+            
+            <div class="menu-container">
+                <button class="btn hidden" id="next-btn" onclick="window.gameApp.nextRound()">다음 안건으로</button>
+                <button class="btn hidden" id="finish-btn" onclick="window.gameApp.showStart()">회의 종료 및 메인으로</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMN79dU0yOjeSurVjmYDi5HWnCJKJutis",
+            authDomain: "spain-1a270.firebaseapp.com",
+            databaseURL: "https://spain-1a270-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "spain-1a270",
+            storageBucket: "spain-1a270.firebasestorage.app",
+            messagingSenderId: "658415176637",
+            appId: "1:658415176637:web:9ebc29faa4eff260bda0d4",
+            measurementId: "G-878R1Y352D"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const iberoCountries = [
+            { name: "당신 (신흥국 수장)", flag: "👑" },
+            { name: "España", flag: "🇪🇸" },
+            { name: "Portugal", flag: "🇵🇹" },
+            { name: "Andorra", flag: "🇦🇩" },
+            { name: "Argentina", flag: "🇦🇷" },
+            { name: "Bolivia", flag: "🇧🇴" },
+            { name: "Brasil", flag: "🇧🇷" },
+            { name: "Chile", flag: "🇨🇱" },
+            { name: "Colombia", flag: "🇨🇴" },
+            { name: "Costa Rica", flag: "🇨🇷" },
+            { name: "Cuba", flag: "🇨🇺" },
+            { name: "Ecuador", flag: "🇪🇨" },
+            { name: "El Salvador", flag: "🇸🇻" },
+            { name: "Guatemala", flag: "🇬🇹" },
+            { name: "Honduras", flag: "🇭🇳" },
+            { name: "México", flag: "🇲🇽" },
+            { name: "Nicaragua", flag: "🇳🇮" },
+            { name: "Panamá", flag: "🇵🇦" },
+            { name: "Paraguay", flag: "🇵🇾" },
+            { name: "Perú", flag: "🇵🇪" },
+            { name: "Rep. Dominicana", flag: "🇩🇴" },
+            { name: "Uruguay", flag: "🇺🇾" },
+            { name: "Venezuela", flag: "🇻🇪" }
+        ];
+
+        const agendaTopics = [
+            { id: 1, type: "objective", text: "[표결] 기후 변화 공동 대응을 위한 '이베로 아메리카 환경 헌장' 채택에 동의하십니까?" },
+            { id: 2, type: "objective", text: "[표결] 역내 디지털 격차 해소를 위한 기술 및 교육 자본 공유 협정에 서명하시겠습니까?" },
+            { id: 3, type: "subjective", text: "[의제] 역내 공동 경제 성장을 위해 시급히 해결해야 할 경제 협력 과제는 무엇이라고 생각하십니까?" },
+            { id: 4, type: "subjective", text: "[의제] 스페인어권 국가 간 인적·문화적 교류를 전방위로 활성화하기 위한 대안을 제안해 주십시오." }
+        ];
+
+        let currentRound = 0;
+        let currentUserNickname = "익명"; // 기본 닉네임 설정
+
+        const gameApp = {
+            // 동의서 수락 시 닉네임 모달 띄우기
+            acceptConsent: function() {
+                document.getElementById('consent-modal').classList.add('hidden');
+                document.getElementById('nickname-modal').classList.remove('hidden');
+            },
+            // 닉네임 저장 및 팝업 닫기
+            saveNickname: function() {
+                const inputNick = document.getElementById('user-nickname').value.trim();
+                if(inputNick) {
+                    currentUserNickname = inputNick;
+                }
+                document.getElementById('nickname-modal').classList.add('hidden');
+            },
+            hideAll: function() {
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('about-screen').classList.add('hidden');
+                document.getElementById('opinion-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.add('hidden');
+            },
+            showStart: function() {
+                this.hideAll();
+                document.getElementById('start-screen').classList.remove('hidden');
+                currentRound = 0;
+            },
+            showAbout: function() {
+                this.hideAll();
+                document.getElementById('about-screen').classList.remove('hidden');
+            },
+            showOpinionTab: function() {
+                this.hideAll();
+                document.getElementById('opinion-screen').classList.remove('hidden');
+            },
+            startGame: function() {
+                this.hideAll();
+                document.getElementById('game-screen').classList.remove('hidden');
+                this.setupTable();
+                this.loadRound();
+            },
+            setupTable: function() {
+                const container = document.getElementById('table-container');
+                const existingChars = container.querySelectorAll('.character');
+                existingChars.forEach(char => char.remove());
+
+                // 기기 크기에 맞춰 반지름과 좌표를 동적으로 계산
+                const containerWidth = container.clientWidth || 300; 
+                const radius = (containerWidth / 2) * 0.85; 
+                const centerX = containerWidth / 2; 
+                const centerY = containerWidth / 2; 
+                const totalCharacters = 22; 
+
+                for (let i = 0; i < totalCharacters; i++) {
+                    const charDiv = document.createElement('div');
+                    charDiv.className = 'character';
+                    
+                    const country = iberoCountries[i];
+
+                    if (i === 0) {
+                        charDiv.classList.add('player');
+                    }
+
+                    const pixelAvatars = ['👨‍💼', '👩‍💼', '👨‍💻', '👩‍🔬', '💂‍♂️', '👑'];
+                    const avatar = (i === 0) ? '👑' : pixelAvatars[i % (pixelAvatars.length - 1)];
+
+                    charDiv.innerHTML = `
+                        <span class="char-flag">${country.flag}</span>
+                        <span class="char-sprite">${avatar}</span>
+                        <span class="char-name">${country.name}</span>
+                    `;
+
+                    const angle = (i / totalCharacters) * (2 * Math.PI) - (Math.PI / 2);
+                    const x = centerX + radius * Math.cos(angle); 
+                    const y = centerY + radius * Math.sin(angle);
+
+                    charDiv.style.left = `${x}px`;
+                    charDiv.style.top = `${y}px`;
+                    container.appendChild(charDiv);
+                }
+            },
+            loadRound: function() {
+                const topicText = document.getElementById('topic-text');
+                const roundNumber = document.getElementById('round-number');
+                const voteControls = document.getElementById('vote-controls');
+                const subjectiveControls = document.getElementById('subjective-controls');
+                const nextBtn = document.getElementById('next-btn');
+                const finishBtn = document.getElementById('finish-btn');
+
+                document.getElementById('opinion-input').value = "";
+
+                if (currentRound < agendaTopics.length) {
+                    const currentAgenda = agendaTopics[currentRound];
+                    roundNumber.innerText = currentRound + 1;
+                    topicText.innerText = currentAgenda.text;
+                    
+                    nextBtn.classList.add('hidden');
+                    finishBtn.classList.add('hidden');
+
+                    if (currentAgenda.type === "objective") {
+                        voteControls.classList.remove('hidden');
+                        subjectiveControls.classList.add('hidden');
+                    } else {
+                        voteControls.classList.add('hidden');
+                        subjectiveControls.classList.remove('hidden');
+                    }
+                } else {
+                    roundNumber.innerText = "FIN";
+                    topicText.innerHTML = "모든 외교 의제 조율이 종료되었습니다.<br><br>작성된 모든 생각은 메인의 OPINION 탭에서 실시간으로 대조 및 확인이 가능합니다.";
+                    voteControls.classList.add('hidden');
+                    subjectiveControls.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    finishBtn.classList.remove('hidden');
+                }
+            },
+            vote: function(choice) {
+                const topicText = document.getElementById('topic-text');
+                const voteControls = document.getElementById('vote-controls');
+                const nextBtn = document.getElementById('next-btn');
+
+                const isPassed = Math.random() > 0.35;
+                let resultText = `<span style="color:#ffeb3b; font-size:0.9rem;">당신의 결정: [${choice}]</span><br><br>`;
+                resultText += isPassed ? "결과: 회원국 다수의 지지로 안건이 가결되었습니다." : "결과: 국가 간 견해 차이로 인해 안건이 부결되었습니다.";
+                
+                topicText.innerHTML = resultText;
+                voteControls.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+            },
+            submitOpinion: function() {
+                const inputVal = document.getElementById('opinion-input').value.trim();
+                if (!inputVal) {
+                    alert("국가의 주장을 입력해 주세요!");
+                    return;
+                }
+
+                const currentAgenda = agendaTopics[currentRound];
+
+                // Firebase에 보낼 때 닉네임 데이터 추가
+                const opinionData = {
+                    agendaId: currentAgenda.id,
+                    agendaTitle: currentAgenda.text,
+                    content: inputVal,
+                    nickname: currentUserNickname, 
+                    timestamp: Date.now()
+                };
+
+                push(ref(db, 'opinions'), opinionData)
+                    .then(() => {
+                        const topicText = document.getElementById('topic-text');
+                        const subjectiveControls = document.getElementById('subjective-controls');
+                        const nextBtn = document.getElementById('next-btn');
+
+                        topicText.innerHTML = `성공적으로 외교 주장이 전송되었습니다!<br><br><span style="color:#ff3838; font-size:0.9rem;">"${inputVal}"</span>`;
+                        subjectiveControls.classList.add('hidden');
+                        nextBtn.classList.remove('hidden');
+                    })
+                    .catch((error) => {
+                        console.error("Firebase 전송 실패:", error);
+                        alert("데이터 전송 중 오류가 발생했습니다.");
+                    });
+            },
+            nextRound: function() {
+                currentRound++;
+                this.loadRound();
+            }
+        };
+
+        const opinionListDiv = document.getElementById('realtime-opinion-list');
+        onValue(ref(db, 'opinions'), (snapshot) => {
+            opinionListDiv.innerHTML = "";
+            const data = snapshot.val();
+            
+            if (!data) {
+                opinionListDiv.innerHTML = `<div style="text-align:center; color:#8a8d9a; padding:20px;">등록된 의견이 아직 없습니다. 첫 의견을 기록해 보세요!</div>`;
+                return;
+            }
+
+            const listItems = [];
+            for (let id in data) {
+                listItems.unshift(data[id]);
+            }
+
+            listItems.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'opinion-item';
+                
+                const date = new Date(item.timestamp).toLocaleTimeString();
+                // 기존 데이터에 닉네임이 없을 경우 '익명' 처리
+                const writer = item.nickname ? item.nickname : "익명";
+
+                itemDiv.innerHTML = `
+                    <div class="opinion-meta">의제 ${item.agendaId} | ${date} | 👤 ${writer}</div>
+                    <div style="font-size:0.8rem; color:#b3b5c2; margin-bottom:5px; border-bottom:1px solid #222; padding-bottom:3px;">Q. ${item.agendaTitle}</div>
+                    <div style="color:#ff3838; font-weight:bold; font-size:0.9rem;">A. ${item.content}</div>
+                `;
+                opinionListDiv.appendChild(itemDiv);
+            });
+        });
+
+        // 윈도우 크기가 변할 때(스마트폰 가로/세로 전환 등) 탁자 레이아웃 재계산
+        window.addEventListener('resize', () => {
+            if (!document.getElementById('game-screen').classList.contains('hidden')) {
+                gameApp.setupTable();
+            }
+        });
+
+        window.gameApp = gameApp;
+        gameApp.showStart();
+    </script>
+</body>
+</html>
