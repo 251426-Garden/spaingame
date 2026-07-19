@@ -85,6 +85,7 @@
             display: block;
             margin: 0 auto;
             max-width: 300px;
+            width: 90%;
         }
 
         .btn {
@@ -127,12 +128,13 @@
             box-shadow: 4px 4px 0px #000;
         }
 
-        /* 텍스트 박스 레이아웃 */
+        /* 텍스트 박스 반응형 레이아웃 */
         .content-box {
             background: var(--surface-color);
             padding: 25px;
             border: 4px solid var(--accent-color);
             box-shadow: 6px 6px 0px #000;
+            width: 90%;
             max-width: 650px;
             margin: 0 auto 20px auto;
             text-align: left;
@@ -147,7 +149,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.85);
-            z-index: 999; /* 화면 최상단에 배치 */
+            z-index: 999;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -155,20 +157,22 @@
 
         .consent-box {
             background: var(--surface-color);
-            padding: 30px;
+            padding: 20px;
             border: 4px solid var(--accent-color);
             box-shadow: 8px 8px 0px #000;
+            width: 90%;
             max-width: 550px;
             text-align: left;
-            line-height: 1.8;
-            margin: 20px;
+            line-height: 1.6;
         }
 
-        /* 게임장 픽셀 붉은 탁자 스타일 */
+        /* 반응형 회의장 탁자 스타일 */
         .table-container {
             position: relative;
-            width: 520px;
-            height: 520px;
+            width: 90vmin; /* 화면의 가장 짧은 길이에 맞춰 정사각형 유지 */
+            max-width: 520px;
+            height: 90vmin;
+            max-height: 520px;
             margin: 10px auto;
             background: rgba(255,255,255,0.02);
             border-radius: 50%;
@@ -180,93 +184,82 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 280px;
-            height: 280px;
+            width: 55%; /* 부모 컨테이너 대비 비율 적용 */
+            height: 55%;
             background-color: #221111;
             border-radius: 50%;
             border: 6px solid var(--accent-color);
             box-shadow: inset 0 0 25px #000, 0 0 20px var(--accent-glow);
-            display: table;
-        }
-        
-        .table-cell {
-            display: table-cell;
-            vertical-align: middle;
-            text-align: center;
-            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
         }
 
         .topic-display {
             font-weight: bold;
-            font-size: 1.05rem;
+            font-size: 1rem;
             color: #fff;
             text-shadow: 1px 1px 2px #000;
-            line-height: 1.5;
+            line-height: 1.4;
+            word-break: keep-all;
         }
 
         /* 국가 수장 노드 스타일 */
         .character {
             position: absolute;
-            width: 50px;
-            height: 50px;
             display: block;
             text-align: center;
             cursor: pointer;
+            transition: left 0.3s, top 0.3s;
+            transform: translate(-50%, -50%); /* 중앙 정렬 계산 최적화 */
         }
 
-        .char-flag {
-            font-size: 22px;
-            line-height: 1;
-            display: block;
-        }
-
-        .char-sprite {
-            font-size: 20px;
-            line-height: 1.2;
-            display: block;
-        }
-
+        .char-flag { font-size: 1.2rem; display: block; line-height: 1.2; }
+        .char-sprite { font-size: 1.1rem; display: block; line-height: 1.2; }
+        
         .char-name {
             font-size: 9px;
             color: #b3b5c2;
             display: block;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             background: rgba(0,0,0,0.7);
-            padding: 1px 2px;
-            border-radius: 2px;
+            padding: 2px 4px;
+            border-radius: 4px;
             margin-top: 2px;
         }
 
-        .character.player {
-            filter: drop-shadow(0 0 8px #ffeb3b);
-        }
-        .character.player .char-name {
-            color: #ffeb3b;
-            font-weight: bold;
-            border: 1px solid #ffeb3b;
-        }
+        .character.player { filter: drop-shadow(0 0 8px #ffeb3b); }
+        .character.player .char-name { color: #ffeb3b; font-weight: bold; border: 1px solid #ffeb3b; }
 
-        /* 입력/제어 컨트롤 패널 */
+        /* 모바일 대응 입력/제어 컨트롤 패널 */
         .controls {
             margin-top: 15px;
             display: block;
             text-align: center;
+            width: 100%;
+            padding: 0 10px;
         }
         
         .flex-controls {
-            display: table;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            max-width: 500px;
             margin: 0 auto;
         }
+        
         .flex-controls .btn {
-            display: inline-block;
             width: auto;
-            margin: 0 8px;
-            padding: 12px 24px;
+            flex: 1 1 30%;
+            margin: 0;
+            padding: 12px;
+            font-size: 0.9rem;
         }
 
         .opinion-input-box {
+            width: 90%;
             max-width: 500px;
             margin: 0 auto;
             background: var(--surface-color);
@@ -286,9 +279,8 @@
             outline: none;
         }
 
-        /* 실시간 의견 피드 스타일 */
         .opinion-list {
-            max-height: 400px;
+            max-height: 40vh;
             overflow-y: auto;
             padding-right: 5px;
         }
@@ -298,14 +290,21 @@
             border-left: 4px solid var(--accent-color);
             padding: 12px;
             margin-bottom: 12px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
-        .opinion-meta {
-            font-size: 0.8rem;
-            color: #8a8d9a;
-            margin-bottom: 5px;
-            font-family: 'Press Start 2P', cursive;
+        .opinion-meta { font-size: 0.75rem; color: #8a8d9a; margin-bottom: 5px; font-family: 'Press Start 2P', cursive; }
+
+        /* 모바일 기기용 미디어 쿼리 조정 */
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.5rem; }
+            .subtitle { font-size: 0.7rem; }
+            .char-flag { font-size: 1rem; }
+            .char-sprite { font-size: 0.9rem; }
+            .char-name { font-size: 8px; padding: 1px 2px; }
+            .topic-display { font-size: 0.85rem; }
+            .btn { font-size: 0.9rem; padding: 12px; }
         }
     </style>
 </head>
@@ -315,15 +314,15 @@
 
     <div id="consent-modal">
         <div class="consent-box">
-            <h3 style="color: var(--accent-color); margin-bottom: 15px; text-align: center; font-size: 1.2rem;">개인정보 이용 동의</h3>
-            <p style="font-size: 0.95rem; margin-bottom: 25px; word-break: keep-all;">
+            <h3 style="color: var(--accent-color); margin-bottom: 15px; text-align: center; font-size: 1.1rem;">개인정보 이용 동의</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 20px; word-break: keep-all;">
                 이베로 아메리카 정상회의 시뮬레이터에 오신 여러분을 환영합니다!<br><br>
                 게임 시작에 앞서, 여러분들의 소중한 주관식 의견이 본 시뮬레이터에 활용될 수 있는 지에 관해서 동의를 받고자 합니다. 동의를 하지 않으신 분들께서는 시뮬레이터 이용에 어려움을 겪을 수 있습니다.<br><br>
                 동의 하시겠습니까?
             </p>
-            <div style="display: flex; gap: 15px; justify-content: center;">
-                <button class="btn red" style="margin: 0; width: 45%; padding: 12px;" onclick="document.getElementById('consent-modal').classList.add('hidden');">동의</button>
-                <button class="btn disabled" style="margin: 0; width: 45%; padding: 12px;" disabled>동의 안함</button>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn red" style="margin: 0; width: 45%; padding: 10px;" onclick="document.getElementById('consent-modal').classList.add('hidden');">동의</button>
+                <button class="btn disabled" style="margin: 0; width: 45%; padding: 10px;" disabled>동의 안함</button>
             </div>
         </div>
     </div>
@@ -350,7 +349,7 @@
     <div id="opinion-screen" class="screen hidden">
         <h2>REAL-TIME OPINIONS</h2>
         <div class="content-box">
-            <p style="margin-top:0; color:var(--accent-color); font-weight:bold;">🔥 정상회의 참가자들이 제출한 실시간 의견 목록</p>
+            <p style="margin-top:0; color:var(--accent-color); font-weight:bold; font-size:0.9rem;">🔥 정상회의 참가자 실시간 의견 목록</p>
             <div class="opinion-list" id="realtime-opinion-list">
                 <div style="text-align:center; color:#8a8d9a; padding:20px;">의견을 불러오는 중입니다...</div>
             </div>
@@ -359,26 +358,24 @@
     </div>
 
     <div id="game-screen" class="screen hidden">
-        <h3 style="font-size:1.2rem; margin-bottom:5px; color:var(--accent-color);">ROUND <span id="round-number">1</span></h3>
+        <h3 style="font-size:1.1rem; margin-bottom:5px; color:var(--accent-color);">ROUND <span id="round-number">1</span></h3>
         
         <div class="table-container" id="table-container">
             <div class="round-table">
-                <div class="table-cell">
-                    <div class="topic-display" id="topic-text">안건 로딩 중...</div>
-                </div>
+                <div class="topic-display" id="topic-text">안건 로딩 중...</div>
             </div>
         </div>
 
         <div class="controls">
             <div id="vote-controls" class="flex-controls hidden">
-                <button class="btn" style="border-color: #2ecc71; color: #2ecc71;" onclick="window.gameApp.vote('찬성(Sí)')">찬성 (Sí)</button>
-                <button class="btn" style="border-color: #e74c3c; color: #e74c3c;" onclick="window.gameApp.vote('반대(No)')">반대 (No)</button>
-                <button class="btn" style="border-color: #f1c40f; color: #f1c40f;" onclick="window.gameApp.vote('기권(Abstención)')">기권</button>
+                <button class="btn" style="border-color: #2ecc71; color: #2ecc71;" onclick="window.gameApp.vote('찬성(Sí)')">찬성(Sí)</button>
+                <button class="btn" style="border-color: #e74c3c; color: #e74c3c;" onclick="window.gameApp.vote('반대(No)')">반대(No)</button>
+                <button class="btn" style="border-color: #f1c40f; color: #f1c40f;" onclick="window.gameApp.vote('기권')">기권</button>
             </div>
 
             <div id="subjective-controls" class="opinion-input-box hidden">
-                <input type="text" id="opinion-input" class="pixel-input" placeholder="이곳에 국가의 공식 의견을 입력하세요..." maxlength="100">
-                <button class="btn red" style="margin:0; padding:10px;" onclick="window.gameApp.submitOpinion()">주장 제출하기 (Enviar)</button>
+                <input type="text" id="opinion-input" class="pixel-input" placeholder="국가의 공식 의견을 입력하세요..." maxlength="100">
+                <button class="btn red" style="margin:0; width:100%; padding:10px;" onclick="window.gameApp.submitOpinion()">주장 제출하기</button>
             </div>
             
             <div class="menu-container">
@@ -433,10 +430,10 @@
         ];
 
         const agendaTopics = [
-            { id: 1, type: "objective", text: "[객관식 표결] 기후 변화 공동 대응을 위한 '이베로 아메리카 환경 헌장' 채택에 동의하십니까?" },
-            { id: 2, type: "objective", text: "[객관식 표결] 역내 디지털 격차 해소를 위한 기술 및 교육 자본 공유 협정에 서명하시겠습니까?" },
-            { id: 3, type: "subjective", text: "[주관식 의제] 역내 공동 경제 성장을 위해 시급히 해결해야 할 경제 협력 과제는 무엇이라고 생각하십니까?" },
-            { id: 4, type: "subjective", text: "[주관식 의제] 스페인어권 국가 간 인적·문화적 교류를 전방위로 활성화하기 위한 구체적인 대안을 제안해 주십시오." }
+            { id: 1, type: "objective", text: "[표결] 기후 변화 공동 대응을 위한 '이베로 아메리카 환경 헌장' 채택에 동의하십니까?" },
+            { id: 2, type: "objective", text: "[표결] 역내 디지털 격차 해소를 위한 기술 및 교육 자본 공유 협정에 서명하시겠습니까?" },
+            { id: 3, type: "subjective", text: "[의제] 역내 공동 경제 성장을 위해 시급히 해결해야 할 경제 협력 과제는 무엇이라고 생각하십니까?" },
+            { id: 4, type: "subjective", text: "[의제] 스페인어권 국가 간 인적·문화적 교류를 전방위로 활성화하기 위한 대안을 제안해 주십시오." }
         ];
 
         let currentRound = 0;
@@ -472,9 +469,11 @@
                 const existingChars = container.querySelectorAll('.character');
                 existingChars.forEach(char => char.remove());
 
-                const radius = 220; 
-                const centerX = 260; 
-                const centerY = 260; 
+                // 기기 크기에 맞춰 반지름과 좌표를 동적으로 계산
+                const containerWidth = container.clientWidth || 300; 
+                const radius = (containerWidth / 2) * 0.85; 
+                const centerX = containerWidth / 2; 
+                const centerY = containerWidth / 2; 
                 const totalCharacters = 22; 
 
                 for (let i = 0; i < totalCharacters; i++) {
@@ -497,8 +496,8 @@
                     `;
 
                     const angle = (i / totalCharacters) * (2 * Math.PI) - (Math.PI / 2);
-                    const x = centerX + radius * Math.cos(angle) - 25; 
-                    const y = centerY + radius * Math.sin(angle) - 25;
+                    const x = centerX + radius * Math.cos(angle); 
+                    const y = centerY + radius * Math.sin(angle);
 
                     charDiv.style.left = `${x}px`;
                     charDiv.style.top = `${y}px`;
@@ -532,7 +531,7 @@
                     }
                 } else {
                     roundNumber.innerText = "FIN";
-                    topicText.innerHTML = "모든 국가적 외교 의제 조율이 종료되었습니다.<br><br>작성된 모든 생각은 메인의 OPINION 탭에서 실시간으로 대조 및 확인이 가능합니다.";
+                    topicText.innerHTML = "모든 외교 의제 조율이 종료되었습니다.<br><br>작성된 모든 생각은 메인의 OPINION 탭에서 실시간으로 대조 및 확인이 가능합니다.";
                     voteControls.classList.add('hidden');
                     subjectiveControls.classList.add('hidden');
                     nextBtn.classList.add('hidden');
@@ -545,7 +544,7 @@
                 const nextBtn = document.getElementById('next-btn');
 
                 const isPassed = Math.random() > 0.35;
-                let resultText = `당신의 결정: <strong>[${choice}]</strong><br><br>`;
+                let resultText = `<span style="color:#ffeb3b; font-size:0.9rem;">당신의 결정: [${choice}]</span><br><br>`;
                 resultText += isPassed ? "결과: 회원국 다수의 지지로 안건이 가결되었습니다." : "결과: 국가 간 견해 차이로 인해 안건이 부결되었습니다.";
                 
                 topicText.innerHTML = resultText;
@@ -574,7 +573,7 @@
                         const subjectiveControls = document.getElementById('subjective-controls');
                         const nextBtn = document.getElementById('next-btn');
 
-                        topicText.innerHTML = `성공적으로 외교 주장이 전송되었습니다!<br><br><strong>제출된 의견:</strong> "${inputVal}"<br><br><span style='font-size:0.85rem; color:#8a8d9a;'>메인화면의 OPINION 탭에서 실시간 취합 현황을 볼 수 있습니다.</span>`;
+                        topicText.innerHTML = `성공적으로 외교 주장이 전송되었습니다!<br><br><span style="color:#ff3838; font-size:0.9rem;">"${inputVal}"</span>`;
                         subjectiveControls.classList.add('hidden');
                         nextBtn.classList.remove('hidden');
                     })
@@ -612,11 +611,18 @@
 
                 itemDiv.innerHTML = `
                     <div class="opinion-meta">의제 ${item.agendaId} | ${date}</div>
-                    <div style="font-size:0.85rem; color:#b3b5c2; margin-bottom:5px; border-bottom:1px solid #222; padding-bottom:3px;">Q. ${item.agendaTitle}</div>
-                    <div style="color:#ff3838; font-weight:bold;">A. ${item.content}</div>
+                    <div style="font-size:0.8rem; color:#b3b5c2; margin-bottom:5px; border-bottom:1px solid #222; padding-bottom:3px;">Q. ${item.agendaTitle}</div>
+                    <div style="color:#ff3838; font-weight:bold; font-size:0.9rem;">A. ${item.content}</div>
                 `;
                 opinionListDiv.appendChild(itemDiv);
             });
+        });
+
+        // 윈도우 크기가 변할 때(스마트폰 가로/세로 전환 등) 탁자 레이아웃 재계산
+        window.addEventListener('resize', () => {
+            if (!document.getElementById('game-screen').classList.contains('hidden')) {
+                gameApp.setupTable();
+            }
         });
 
         window.gameApp = gameApp;
