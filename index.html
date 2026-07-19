@@ -32,7 +32,6 @@
             overflow: hidden;
         }
 
-        /* 검은색과 붉은색 테마의 픽셀 그리드 배경 */
         .background {
             position: absolute;
             top: 0;
@@ -114,7 +113,6 @@
         .btn.red { border-color: var(--accent-color); color: var(--accent-color); }
         .btn.red:hover { background-color: var(--accent-color); color: white; box-shadow: 6px 6px 0px #fff; }
 
-        /* 클릭 불가능한 버튼 스타일 */
         .btn.disabled {
             border-color: #555;
             color: #555;
@@ -128,7 +126,6 @@
             box-shadow: 4px 4px 0px #000;
         }
 
-        /* 텍스트 박스 반응형 레이아웃 */
         .content-box {
             background: var(--surface-color);
             padding: 25px;
@@ -141,7 +138,6 @@
             line-height: 1.8;
         }
 
-        /* 모달창 공통 스타일 */
         #consent-modal, #nickname-modal {
             position: fixed;
             top: 0;
@@ -166,7 +162,6 @@
             line-height: 1.6;
         }
 
-        /* 반응형 회의장 탁자 스타일 */
         .table-container {
             position: relative;
             width: 90vmin; 
@@ -205,7 +200,6 @@
             word-break: keep-all;
         }
 
-        /* 국가 수장 노드 스타일 */
         .character {
             position: absolute;
             display: block;
@@ -232,7 +226,6 @@
         .character.player { filter: drop-shadow(0 0 8px #ffeb3b); }
         .character.player .char-name { color: #ffeb3b; font-weight: bold; border: 1px solid #ffeb3b; }
 
-        /* 모바일 대응 입력/제어 컨트롤 패널 */
         .controls {
             margin-top: 15px;
             display: block;
@@ -295,7 +288,6 @@
 
         .opinion-meta { font-size: 0.75rem; color: #8a8d9a; margin-bottom: 5px; font-family: 'Press Start 2P', cursive; }
 
-        /* 모바일 기기용 미디어 쿼리 조정 */
         @media (max-width: 600px) {
             h1 { font-size: 2.2rem; }
             h2 { font-size: 1.5rem; }
@@ -312,7 +304,7 @@
 
     <div class="background"></div>
 
-    <div id="consent-modal">
+    <div id="consent-modal" class="hidden">
         <div class="consent-box">
             <h3 style="color: var(--accent-color); margin-bottom: 15px; text-align: center; font-size: 1.1rem;">개인정보 이용 동의</h3>
             <p style="font-size: 0.9rem; margin-bottom: 20px; word-break: keep-all;">
@@ -334,8 +326,8 @@
                 OPINION 탭에 표시될 당신의 닉네임을 입력해 주세요.<br>
                 (입력하지 않으면 '익명'으로 처리됩니다.)
             </p>
-            <input type="text" id="user-nickname" class="pixel-input" placeholder="닉네임 입력 (최대 10자)" maxlength="10" style="text-align: center; margin-bottom: 20px;">
-            <button class="btn red" style="margin: 0 auto; width: 80%; padding: 12px;" onclick="window.gameApp.saveNickname()">게임 시작하기</button>
+            <input type="text" id="user-nickname" class="pixel-input" placeholder="닉네임 (최대 10자)" maxlength="10" style="text-align: center; margin-bottom: 20px;">
+            <button class="btn red" style="margin: 0 auto; width: 80%; padding: 12px;" onclick="window.gameApp.saveNickname()">확인 및 게임시작</button>
         </div>
     </div>
 
@@ -353,7 +345,7 @@
         <h2>ABOUT</h2>
         <div class="content-box">
             <p><strong>이베로 아메리카 정상회의(Cumbre Iberoamericana)</strong>는 스페인어와 포르투갈어를 공용어로 사용하는 유럽과 아메리카 대륙의 22개국 국가 원수들이 모여 교류하는 국제 정상협의체입니다.</p>
-            <p>본 시뮬레이터에서 참가자는 새로운 스페인어권 국가의 수장이 되어 원형 테이블에 둘러앉아 역사적인 의사결정과 의제 투표에 직접 참여하게 됩니다. 다수결 객관식 표결안건뿐만 아니라 주관식 의견 제안 라운드를 경험할 수 있습니다.</p>
+            <p>본 시뮬레이터에서 참가자는 새로운 스페인어권 국가의 수장이 되어 원형 테이블에 둘러앉아 역사적인 의사결정과 의제 투표에 직접 참여하게 됩니다.</p>
         </div>
         <div class="menu-container"><button class="btn" onclick="window.gameApp.showStart()">BACK</button></div>
     </div>
@@ -449,21 +441,21 @@
         ];
 
         let currentRound = 0;
-        let currentUserNickname = "익명"; // 기본 닉네임 설정
+        let currentUserNickname = "익명"; 
 
         const gameApp = {
-            // 동의서 수락 시 닉네임 모달 띄우기
             acceptConsent: function() {
                 document.getElementById('consent-modal').classList.add('hidden');
                 document.getElementById('nickname-modal').classList.remove('hidden');
             },
-            // 닉네임 저장 및 팝업 닫기
             saveNickname: function() {
                 const inputNick = document.getElementById('user-nickname').value.trim();
                 if(inputNick) {
                     currentUserNickname = inputNick;
                 }
                 document.getElementById('nickname-modal').classList.add('hidden');
+                // UX 편의를 위해 닉네임 확인 후 곧바로 게임화면(START)으로 넘어갑니다.
+                this.startGame();
             },
             hideAll: function() {
                 document.getElementById('start-screen').classList.add('hidden');
@@ -495,7 +487,6 @@
                 const existingChars = container.querySelectorAll('.character');
                 existingChars.forEach(char => char.remove());
 
-                // 기기 크기에 맞춰 반지름과 좌표를 동적으로 계산
                 const containerWidth = container.clientWidth || 300; 
                 const radius = (containerWidth / 2) * 0.85; 
                 const centerX = containerWidth / 2; 
@@ -586,7 +577,6 @@
 
                 const currentAgenda = agendaTopics[currentRound];
 
-                // Firebase에 보낼 때 닉네임 데이터 추가
                 const opinionData = {
                     agendaId: currentAgenda.id,
                     agendaTitle: currentAgenda.text,
@@ -636,7 +626,6 @@
                 itemDiv.className = 'opinion-item';
                 
                 const date = new Date(item.timestamp).toLocaleTimeString();
-                // 기존 데이터에 닉네임이 없을 경우 '익명' 처리
                 const writer = item.nickname ? item.nickname : "익명";
 
                 itemDiv.innerHTML = `
@@ -648,7 +637,6 @@
             });
         });
 
-        // 윈도우 크기가 변할 때(스마트폰 가로/세로 전환 등) 탁자 레이아웃 재계산
         window.addEventListener('resize', () => {
             if (!document.getElementById('game-screen').classList.contains('hidden')) {
                 gameApp.setupTable();
@@ -656,7 +644,9 @@
         });
 
         window.gameApp = gameApp;
-        gameApp.showStart();
+        
+        // 스크립트 로딩 완료 후 안전하게 모달창을 띄웁니다!
+        document.getElementById('consent-modal').classList.remove('hidden');
     </script>
 </body>
 </html>
