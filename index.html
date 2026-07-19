@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이베로 아메리카 정상회의 시뮬레이터</title>
+    <style>
+        /* 픽셀 폰트 로드 */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;700&display=swap');
+
+        :root {
+            --bg-color: #0d0d11;
+            --surface-color: #1a1a24;
+            --accent-color: #ff3838;
+            --accent-glow: rgba(255, 56, 56, 0.4);
+            --text-color: #f1f2f6;
+            --pixel-border: 4px solid #fff;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* 검은색과 붉은색 테마의 픽셀 그리드 배경 */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(rgba(255, 56, 56, 0.08) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255, 56, 56, 0.08) 2px, transparent 2px);
+            background-size: 32px 32px;
+            z-index: 1;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            text-align: center;
+            padding-top: 5vh;
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Press Start 2P', 'Noto Sans KR', cursive;
+            text-shadow: 0 0 10px var(--accent-glow);
+            line-height: 1.4;
+            margin-top: 0;
+        }
+
+        h1 { font-size: 2.8rem; margin-bottom: 10px; color: var(--accent-color); }
+        h2 { font-size: 1.8rem; margin-bottom: 20px; color: #fff; border-bottom: 4px dashed var(--accent-color); display: inline-block; padding-bottom: 10px;}
+
+        .subtitle {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            color: #8a8d9a;
+            margin-bottom: 40px;
+        }
+
+        .menu-container {
+            display: block;
+            margin: 0 auto;
+            max-width: 300px;
+        }
+
+        .btn {
+            font-family: 'Press Start 2P', cursive;
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin: 14px 0;
+            font-size: 1.1rem;
+            background-color: var(--surface-color);
+            color: white;
+            border: var(--pixel-border);
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #000;
+            image-rendering: pixelated;
+        }
+
+        .btn:hover {
+            background-color: white;
+            color: var(--bg-color);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--accent-color);
+        }
+
+        .btn.red { border-color: var(--accent-color); color: var(--accent-color); }
+        .btn.red:hover { background-color: var(--accent-color); color: white; box-shadow: 6px 6px 0px #fff; }
+
+        /* 테박스 레이아웃 (ABOUT, OPINION) */
+        .content-box {
+            background: var(--surface-color);
+            padding: 25px;
+            border: 4px solid var(--accent-color);
+            box-shadow: 6px 6px 0px #000;
+            max-width: 650px;
+            margin: 0 auto 20px auto;
+            text-align: left;
+            line-height: 1.8;
+        }
+
+        /* 게임장 픽셀 붉은 탁자 스타일 */
+        .table-container {
+            position: relative;
+            width: 520px;
+            height: 520px;
+            margin: 10px auto;
+            background: rgba(255,255,255,0.02);
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 56, 56, 0.2);
+        }
+
+        .round-table {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            height: 280px;
+            background-color: #221111;
+            border-radius: 50%;
+            border: 6px solid var(--accent-color);
+            box-shadow: inset 0 0 25px #000, 0 0 20px var(--accent-glow);
+            display: table;
+        }
+        
+        .table-cell {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .topic-display {
+            font-weight: bold;
+            font-size: 1.05rem;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
+            line-height: 1.5;
+        }
+
+        /* 국가 수장 노드 스타일 */
+        .character {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            display: block;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .char-flag {
+            font-size: 22px;
+            line-height: 1;
+            display: block;
+        }
+
+        .char-sprite {
+            font-size: 20px;
+            line-height: 1.2;
+            display: block;
+        }
+
+        .char-name {
+            font-size: 9px;
+            color: #b3b5c2;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: rgba(0,0,0,0.7);
+            padding: 1px 2px;
+            border-radius: 2px;
+            margin-top: 2px;
+        }
+
+        .character.player {
+            filter: drop-shadow(0 0 8px #ffeb3b);
+        }
+        .character.player .char-name {
+            color: #ffeb3b;
+            font-weight: bold;
+            border: 1px solid #ffeb3b;
+        }
+
+        /* 입력/제어 컨트롤 패널 */
+        .controls {
+            margin-top: 15px;
+            display: block;
+            text-align: center;
+        }
+        
+        .flex-controls {
+            display: table;
+            margin: 0 auto;
+        }
+        .flex-controls .btn {
+            display: inline-block;
+            width: auto;
+            margin: 0 8px;
+            padding: 12px 24px;
+        }
+
+        .opinion-input-box {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--surface-color);
+            padding: 15px;
+            border: 4px solid #fff;
+        }
+
+        .pixel-input {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            border: 2px solid var(--accent-color);
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        /* 실시간 의견 피드 스타일 */
+        .opinion-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .opinion-item {
+            background: #0d0d11;
+            border-left: 4px solid var(--accent-color);
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .opinion-meta {
+            font-size: 0.8rem;
+            color: #8a8d9a;
+            margin-bottom: 5px;
+            font-family: 'Press Start 2P', cursive;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background"></div>
+
+    <div id="start-screen" class="screen">
+        <h1>CUMBRE<br>IBEROAMERICANA</h1>
+        <div class="subtitle">IBERO-AMERICAN SUMMIT SIMULATOR</div>
+        <div class="menu-container">
+            <button class="btn red" onclick="window.gameApp.startGame()">START</button>
+            <button class="btn" onclick="window.gameApp.showAbout()">ABOUT</button>
+            <button class="btn" onclick="window.gameApp.showOpinionTab()">OPINION</button>
+        </div>
+    </div>
+
+    <div id="about-screen" class="screen hidden">
+        <h2>ABOUT</h2>
+        <div class="content-box">
+            <p><strong>이베로 아메리카 정상회의(Cumbre Iberoamericana)</strong>는 스페인어와 포르투갈어를 공용어로 사용하는 유럽과 아메리카 대륙의 22개국 국가 원수들이 모여 교류하는 국제 정상협의체입니다.</p>
+            <p>본 시뮬레이터에서 참가자는 새로운 스페인어권 국가의 수장이 되어 원형 테이블에 둘러앉아 역사적인 의사결정과 의제 투표에 직접 참여하게 됩니다. 다수결 객관식 표결안건뿐만 아니라 주관식 의견 제안 라운드를 경험할 수 있습니다.</p>
+        </div>
+        <div class="menu-container"><button class="btn" onclick="window.gameApp.showStart()">BACK</button></div>
+    </div>
+
+    <div id="opinion-screen" class="screen hidden">
+        <h2>REAL-TIME OPINIONS</h2>
+        <div class="content-box">
+            <p style="margin-top:0; color:var(--accent-color); font-weight:bold;">🔥 정상회의 참가자들이 제출한 실시간 의견 목록</p>
+            <div class="opinion-list" id="realtime-opinion-list">
+                <div style="text-align:center; color:#8a8d9a; padding:20px;">의견을 불러오는 중입니다...</div>
+            </div>
+        </div>
+        <div class="menu-container"><button class="btn" onclick="window.gameApp.showStart()">BACK</button></div>
+    </div>
+
+    <div id="game-screen" class="screen hidden">
+        <h3 style="font-size:1.2rem; margin-bottom:5px; color:var(--accent-color);">ROUND <span id="round-number">1</span></h3>
+        
+        <div class="table-container" id="table-container">
+            <div class="round-table">
+                <div class="table-cell">
+                    <div class="topic-display" id="topic-text">안건 로딩 중...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div id="vote-controls" class="flex-controls hidden">
+                <button class="btn" style="border-color: #2ecc71; color: #2ecc71;" onclick="window.gameApp.vote('찬성(Sí)')">찬성 (Sí)</button>
+                <button class="btn" style="border-color: #e74c3c; color: #e74c3c;" onclick="window.gameApp.vote('반대(No)')">반대 (No)</button>
+                <button class="btn" style="border-color: #f1c40f; color: #f1c40f;" onclick="window.gameApp.vote('기권(Abstención)')">기권</button>
+            </div>
+
+            <div id="subjective-controls" class="opinion-input-box hidden">
+                <input type="text" id="opinion-input" class="pixel-input" placeholder="이곳에 국가의 공식 의견을 입력하세요..." maxlength="100">
+                <button class="btn red" style="margin:0; padding:10px;" onclick="window.gameApp.submitOpinion()">주장 제출하기 (Enviar)</button>
+            </div>
+            
+            <div class="menu-container">
+                <button class="btn hidden" id="next-btn" onclick="window.gameApp.nextRound()">다음 안건으로</button>
+                <button class="btn hidden" id="finish-btn" onclick="window.gameApp.showStart()">회의 종료 및 메인으로</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+
+        // 제공해주신 Firebase 설정값 반영
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMN79dU0yOjeSurVjmYDi5HWnCJKJutis",
+            authDomain: "spain-1a270.firebaseapp.com",
+            databaseURL: "https://spain-1a270-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "spain-1a270",
+            storageBucket: "spain-1a270.firebasestorage.app",
+            messagingSenderId: "658415176637",
+            appId: "1:658415176637:web:9ebc29faa4eff260bda0d4",
+            measurementId: "G-878R1Y352D"
+        };
+
+        // Firebase 초기화 및 DB 객체 획득
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 이베로 아메리카 정상회의 22개 참가국 데이터 (국기 및 국가명)
+        const iberoCountries = [
+            { name: "당신 (신흥국 수장)", flag: "👑" }, // 플레이어 위치
+            { name: "España", flag: "🇪🇸" },
+            { name: "Portugal", flag: "🇵🇹" },
+            { name: "Andorra", flag: "🇦🇩" },
+            { name: "Argentina", flag: "🇦🇷" },
+            { name: "Bolivia", flag: "🇧🇴" },
+            { name: "Brasil", flag: "🇧🇷" },
+            { name: "Chile", flag: "🇨🇱" },
+            { name: "Colombia", flag: "🇨🇴" },
+            { name: "Costa Rica", flag: "🇨🇷" },
+            { name: "Cuba", flag: "🇨🇺" },
+            { name: "Ecuador", flag: "🇪🇨" },
+            { name: "El Salvador", flag: "🇸🇻" },
+            { name: "Guatemala", flag: "🇬🇹" },
+            { name: "Honduras", flag: "🇭🇳" },
+            { name: "México", flag: "🇲🇽" },
+            { name: "Nicaragua", flag: "🇳🇮" },
+            { name: "Panamá", flag: "🇵🇦" },
+            { name: "Paraguay", flag: "🇵🇾" },
+            { name: "Perú", flag: "🇵🇪" },
+            { name: "Rep. Dominicana", flag: "🇩🇴" },
+            { name: "Uruguay", flag: "🇺🇾" },
+            { name: "Venezuela", flag: "🇻🇪" }
+        ];
+
+        // 안건 데이터 구성 (1, 2라운드는 객관식 / 3, 4라운드는 주관식 의견 수렴)
+        const agendaTopics = [
+            { id: 1, type: "objective", text: "[객관식 표결] 기후 변화 공동 대응을 위한 '이베로 아메리카 환경 헌장' 채택에 동의하십니까?" },
+            { id: 2, type: "objective", text: "[객관식 표결] 역내 디지털 격차 해소를 위한 기술 및 교육 자본 공유 협정에 서명하시겠습니까?" },
+            { id: 3, type: "subjective", text: "[주관식 의제] 역내 공동 경제 성장을 위해 시급히 해결해야 할 경제 협력 과제는 무엇이라고 생각하십니까?" },
+            { id: 4, type: "subjective", text: "[주관식 의제] 스페인어권 국가 간 인적·문화적 교류를 전방위로 활성화하기 위한 구체적인 대안을 제안해 주십시오." }
+        ];
+
+        let currentRound = 0;
+
+        // 전역 관리를 위한 객체 선언 및 매핑
+        const gameApp = {
+            hideAll: function() {
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('about-screen').classList.add('hidden');
+                document.getElementById('opinion-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.add('hidden');
+            },
+            showStart: function() {
+                this.hideAll();
+                document.getElementById('start-screen').classList.remove('hidden');
+                currentRound = 0;
+            },
+            showAbout: function() {
+                this.hideAll();
+                document.getElementById('about-screen').classList.remove('hidden');
+            },
+            showOpinionTab: function() {
+                this.hideAll();
+                document.getElementById('opinion-screen').classList.remove('hidden');
+            },
+            startGame: function() {
+                this.hideAll();
+                document.getElementById('game-screen').classList.remove('hidden');
+                this.setupTable();
+                this.loadRound();
+            },
+            setupTable: function() {
+                const container = document.getElementById('table-container');
+                const existingChars = container.querySelectorAll('.character');
+                existingChars.forEach(char => char.remove());
+
+                const radius = 220; 
+                const centerX = 260; 
+                const centerY = 260; 
+                const totalCharacters = 22; 
+
+                for (let i = 0; i < totalCharacters; i++) {
+                    const charDiv = document.createElement('div');
+                    charDiv.className = 'character';
+                    
+                    const country = iberoCountries[i];
+
+                    if (i === 0) {
+                        charDiv.classList.add('player');
+                    }
+
+                    // 픽셀 느낌을 주기 위한 아바타 풀
+                    const pixelAvatars = ['👨‍💼', '👩‍💼', '👨‍💻', '👩‍🔬', '💂‍♂️', '👑'];
+                    const avatar = (i === 0) ? '👑' : pixelAvatars[i % (pixelAvatars.length - 1)];
+
+                    charDiv.innerHTML = `
+                        <span class="char-flag">${country.flag}</span>
+                        <span class="char-sprite">${avatar}</span>
+                        <span class="char-name">${country.name}</span>
+                    `;
+
+                    const angle = (i / totalCharacters) * (2 * Math.PI) - (Math.PI / 2);
+                    const x = centerX + radius * Math.cos(angle) - 25; 
+                    const y = centerY + radius * Math.sin(angle) - 25;
+
+                    charDiv.style.left = `${x}px`;
+                    charDiv.style.top = `${y}px`;
+                    container.appendChild(charDiv);
+                }
+            },
+            loadRound: function() {
+                const topicText = document.getElementById('topic-text');
+                const roundNumber = document.getElementById('round-number');
+                const voteControls = document.getElementById('vote-controls');
+                const subjectiveControls = document.getElementById('subjective-controls');
+                const nextBtn = document.getElementById('next-btn');
+                const finishBtn = document.getElementById('finish-btn');
+
+                // 입력란 초기화
+                document.getElementById('opinion-input').value = "";
+
+                if (currentRound < agendaTopics.length) {
+                    const currentAgenda = agendaTopics[currentRound];
+                    roundNumber.innerText = currentRound + 1;
+                    topicText.innerText = currentAgenda.text;
+                    
+                    nextBtn.classList.add('hidden');
+                    finishBtn.classList.add('hidden');
+
+                    if (currentAgenda.type === "objective") {
+                        voteControls.classList.remove('hidden');
+                        subjectiveControls.classList.add('hidden');
+                    } else {
+                        voteControls.classList.add('hidden');
+                        subjectiveControls.classList.remove('hidden');
+                    }
+                } else {
+                    roundNumber.innerText = "FIN";
+                    topicText.innerHTML = "모든 국가적 외교 의제 조율이 종료되었습니다.<br><br>작성된 모든 생각은 메인의 OPINION 탭에서 실시간으로 대조 및 확인이 가능합니다.";
+                    voteControls.classList.add('hidden');
+                    subjectiveControls.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    finishBtn.classList.remove('hidden');
+                }
+            },
+            vote: function(choice) {
+                const topicText = document.getElementById('topic-text');
+                const voteControls = document.getElementById('vote-controls');
+                const nextBtn = document.getElementById('next-btn');
+
+                const isPassed = Math.random() > 0.35;
+                let resultText = `당신의 결정: <strong>[${choice}]</strong><br><br>`;
+                resultText += isPassed ? "결과: 회원국 다수의 지지로 안건이 가결되었습니다." : "결과: 국가 간 견해 차이로 인해 안건이 부결되었습니다.";
+                
+                topicText.innerHTML = resultText;
+                voteControls.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+            },
+            submitOpinion: function() {
+                const inputVal = document.getElementById('opinion-input').value.trim();
+                if (!inputVal) {
+                    alert("국가의 주장을 입력해 주세요!");
+                    return;
+                }
+
+                const currentAgenda = agendaTopics[currentRound];
+
+                // Firebase Realtime Database에 저장될 데이터 구조 생성
+                const opinionData = {
+                    agendaId: currentAgenda.id,
+                    agendaTitle: currentAgenda.text,
+                    content: inputVal,
+                    timestamp: Date.now()
+                };
+
+                // Firebase DB의 'opinions' 노드에 push
+                push(ref(db, 'opinions'), opinionData)
+                    .then(() => {
+                        const topicText = document.getElementById('topic-text');
+                        const subjectiveControls = document.getElementById('subjective-controls');
+                        const nextBtn = document.getElementById('next-btn');
+
+                        topicText.innerHTML = `성공적으로 외교 주장이 전송되었습니다!<br><br><strong>제출된 의견:</strong> "${inputVal}"<br><br><span style='font-size:0.85rem; color:#8a8d9a;'>메인화면의 OPINION 탭에서 실시간 취합 현황을 볼 수 있습니다.</span>`;
+                        subjectiveControls.classList.add('hidden');
+                        nextBtn.classList.remove('hidden');
+                    })
+                    .catch((error) => {
+                        console.error("Firebase 전송 실패:", error);
+                        alert("데이터 전송 중 오류가 발생했습니다.");
+                    });
+            },
+            nextRound: function() {
+                currentRound++;
+                this.loadRound();
+            }
+        };
+
+        // Firebase 데이터 실시간 동기화 (OPINION 탭 데이터 리스너)
+        const opinionListDiv = document.getElementById('realtime-opinion-list');
+        onValue(ref(db, 'opinions'), (snapshot) => {
+            opinionListDiv.innerHTML = "";
+            const data = snapshot.val();
+            
+            if (!data) {
+                opinionListDiv.innerHTML = `<div style="text-align:center; color:#8a8d9a; padding:20px;">등록된 의견이 아직 없습니다. 첫 의견을 기록해 보세요!</div>`;
+                return;
+            }
+
+            // 최신 글이 맨 위로 오도록 정렬하기 위해 배열화
+            const listItems = [];
+            for (let id in data) {
+                listItems.unshift(data[id]);
+            }
+
+            listItems.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'opinion-item';
+                
+                // 간단한 시간 포맷팅
+                const date = new Date(item.timestamp).toLocaleTimeString();
+
+                itemDiv.innerHTML = `
+                    <div class="opinion-meta">의제 ${item.agendaId} | ${date}</div>
+                    <div style="font-size:0.85rem; color:#b3b5c2; margin-bottom:5px; border-bottom:1px solid #222; padding-bottom:3px;">Q. ${item.agendaTitle}</div>
+                    <div style="color:#ff3838; font-weight:bold;">A. ${item.content}</div>
+                `;
+                opinionListDiv.appendChild(itemDiv);
+            });
+        });
+
+        // 전역 윈도우 스코프 바인딩
+        window.gameApp = gameApp;
+        gameApp.showStart();
+    </script>
+</body>
+</html>
